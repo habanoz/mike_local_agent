@@ -12,7 +12,7 @@ def get_summary_chain(kllm: Kllm, registry: PromptRegistry):
     summary_chain = (
         (
                 ChatPromptTemplate.from_template(generate_file_summary)
-                | kllm.get_deterministic_llm()
+                | kllm.get_small_llm()
                 | StrOutputParser()
         )
         .with_config(run_name="SummarizeUploadedFile")

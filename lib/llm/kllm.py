@@ -10,6 +10,7 @@ class Kllm:
         self.answer_llm = LLMFactory.build(config['answer'])
         self.code_llm = LLMFactory.build(config['code'])
         self.deterministic_llm = LLMFactory.build(config['deterministic'])
+        self.small_llm = LLMFactory.build(config['small'])
 
     def get_answer_llm(self):
         return self.answer_llm
@@ -19,6 +20,9 @@ class Kllm:
 
     def get_deterministic_llm(self):
         return self.deterministic_llm
+    
+    def get_small_llm(self):
+        return self.small_llm
 
     def get_code_llm_runnable(self, name, chain_sink: ChainOutputSink):
         return (RunnableLambda(lambda x: self.push_prompt(x, name, chain_sink))
@@ -51,13 +55,23 @@ class LLMFactory:
         provider = config['provider']
         if provider == "ollama":
             return LLMFactory.ollama(config)
+        if provider == "groq":
+            return LLMFactory.groq(config)
         else:
             raise Exception("Unknown provider" + str(provider))
 
     @classmethod
     def ollama(cls, config):
-        from langchain_community.chat_models import ChatOllama
+        from langchain_ollama import ChatOllama
         return ChatOllama(model=config['model'],
                           base_url=config['base_url'],
                           temperature=config['temperature'],
-                          stop=config['stop'])
+                          reasoning=False)
+
+    @classmethod
+    def groq(cls, config):
+        from langchain_groq import ChatGroq
+        return ChatGroq(model=config['model'],
+                        base_url=config.get('base_url', None),
+                        temperature=config['temperature'],
+                        reasoning_effort=config.get('reasoning_effort', 'none'))

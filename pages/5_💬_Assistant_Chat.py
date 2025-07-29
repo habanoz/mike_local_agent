@@ -2,20 +2,23 @@ import uuid
 from collections.abc import Callable
 
 import streamlit as st
-
+import uuid
 from Home import show_sidebar
-from lib.chain.chains import get_main_chain_stream
+from lib.agent.agent_factory import build_agent
 from lib.service.chat_history_service import ChatHistoryService
 from lib.st.session_service import SessionService
 from lib.st.cached import db_manager, config, prompts_registry, user_file_vector_store
 from lib.utils.chain_output_sink import ChainOutputSink
 from lib.utils.chat_history_utils import get_files_to_keep
-
+from lib.tool import load_functions
+from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 
 @st.cache_resource
 def chat_history_service():
     return ChatHistoryService(db_manager())
 
+def get_available_tools()-> list:
+    return [fn for fn_name, fn in load_functions().items()]
 
 def get_chain_sink() -> ChainOutputSink:
     if "chain_sink" not in st.session_state:
@@ -24,16 +27,14 @@ def get_chain_sink() -> ChainOutputSink:
     return st.session_state["chain_sink"]
 
 
-def get_session_chain() -> Callable:
-    if "session_chain" not in st.session_state:
+def get_session_agent() -> Callable:
+    if "session_agent" not in st.session_state:
         with st.spinner("Building..."):
             print("Building chat session...")
-            session_files = SessionService.get_session_files()
-            st.session_state["session_chain"] = get_main_chain_stream(
-                config(), prompts_registry(), session_files, user_file_vector_store(), get_chain_sink()
-            )
+            session_id = st.session_state["chat_id"]
+            st.session_state["session_agent"] = build_agent(session_id=session_id, tools=get_available_tools(), config=config())
 
-    return st.session_state["session_chain"]
+    return st.session_state["session_agent"]
 
 
 @st.experimental_dialog("File")
@@ -57,6 +58,9 @@ def wait_failure():
 
 @st.experimental_dialog("Debug Info", width="large")
 def show_debug(debug):
+    if not debug:
+        return
+    
     tabs = st.tabs([d['name'].replace("prompt", "prmp")[:11] for d in debug])
     for tab, d in zip(tabs, debug):
         with tab:
@@ -104,26 +108,19 @@ def main():
             question = messages[-1]['content']
             chat_history = messages[1:-1]  # first item is introduction, we can skip it.
 
-            answer_chain_stream = get_session_chain()(question, chat_history)
-
             with st.spinner("Generating response..."):
-                first_token = next(answer_chain_stream)
+                result = get_session_agent()(question, chat_history)
 
-            def generator(initial, answer_generator):
-                yield initial
-                for chunk in answer_generator:
-                    yield chunk
+                st.write(result)
+                assert isinstance(result, str)
 
-            result = st.write_stream(generator(first_token, answer_chain_stream))
-            assert isinstance(result, str)
+                files = get_chain_sink().get_and_clear_source_files_sink()
+                debug = get_chain_sink().get_and_clear_debug_sink()
 
-            files = get_chain_sink().get_and_clear_source_files_sink()
-            debug = get_chain_sink().get_and_clear_debug_sink()
-
-            files_to_keep = get_files_to_keep(files, result)
+                files_to_keep = get_files_to_keep(files, result)
 
             chat_id = st.session_state["chat_id"]
-            chat_history_service().add_utterance(chat_id, "ai", result, files=files_to_keep, debug=debug)
+            chat_history_service().add_utterance(chat_id, "ai", result, files=files_to_keep, debug=debug, tool=tool)
 
             st.session_state.messages.append({"role": "ai", "content": result, "files": files_to_keep, "debug": debug})
 

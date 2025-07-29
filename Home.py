@@ -5,7 +5,9 @@ import streamlit as st
 
 logger = logging.getLogger(__name__)
 
-
+from dotenv import load_dotenv
+load_dotenv(dotenv_path=".env")
+# 
 def main():
     st.set_page_config(page_title="Home", page_icon="🏠")
 

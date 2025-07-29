@@ -19,7 +19,7 @@ class ChatHistoryService:
 
             session.add(new_chat)
 
-    def add_utterance(self, chat_id: uuid, type: str, message: str, files=None, debug=None):
+    def add_utterance(self, chat_id: uuid, type: str, message: str, files=None, debug=None, tool=None):
         with self.db_manager.session_scope() as session:
             new_utterance = Utterance(
                 id=uuid.uuid4(),
@@ -27,7 +27,8 @@ class ChatHistoryService:
                 type=type,
                 message=message,
                 files=files if files else None,
-                debug=debug if debug else None
+                debug=debug if debug else None,
+                tool=tool if tool else None
             )
 
             session.add(new_utterance)

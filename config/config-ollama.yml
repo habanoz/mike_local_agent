@@ -1,0 +1,33 @@
+config:
+  llms:
+    answer:
+      provider: ollama
+      model: llama3:instruct
+      base_url: http://192.168.1.107:11434
+      temperature: 0.3
+      reasoning: false
+
+    deterministic:
+      provider: ollama
+      model: llama3:instruct
+      base_url: http://192.168.1.107:11434
+      temperature: 0.0
+      reasoning: false
+
+    code:
+      provider: ollama
+      model: eramax/nxcode-cq-7b-orpo:q6
+      base_url: http://192.168.1.107:11434
+      temperature: 0.3
+      reasoning: false
+
+  embeddings:
+    provider: ollama
+    model: nomic-embed-text
+    dimensions: 768
+    base_url: http://192.168.1.107:11434
+  vector_store:
+    provider: faiss
+  db:
+    connection_string: sqlite:///assistant.db
+  profile: dev

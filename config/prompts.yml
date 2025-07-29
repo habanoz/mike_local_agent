@@ -27,42 +27,11 @@ prompts:
       - Provide grounded information only.
       - If it is relevant provide links.
 
+      You will be provided with a set of tools to help you answer user questions. Use the tools when necessary. If your answers are based on documents, generate in-text citations to the source document ids using the following format ([[id]]).e.g. [[1]] [[2]] [[5]]. Citations are important to show that your answers are grounded.
+
   - task: answer_initial_ai
     content: |-
       {{introduction_message}}
-
-  - task: answer_grounded_system
-    content: |-
-      Here are documents containing relevant facts.
-      ```
-      {context}
-      ```
-      Use the documents to generate answer to questions. Do not copy verbatim from the documents, rephrase the information into a form relevant to user's question. Exclude unnecessary details.
-      The documents are given to you to produce grounded answers. Do NOT say "According to documents" when answering.
-      For every passage, generate in-text citations to the source document ids using the following format ([[id]]).e.g. [[1]] [[2]] [[5]]. Citations are important to show that your answers are grounded.
-      If answer is not found in the given documents, admit you do not have the answer. Do NOT provide ungrounded information.
-
-  - task: select_next_action
-    content: |-
-      You are very good at reasoning. Your task is to select the next action suitable to answer the user's question. You have been given special training for this task and you select the next action very accurately.
-      
-      Available documents:
-      - Document 1 : Precipitation in amazon rainforest in 2023.
-      {uploaded_file_summaries}
-      
-      Available actions:
-      1. web_search - For general knowledge, up-to-date information, books and journals, historical data, online resources.
-      2. db_lookup - When one of the db rows contains relevant information.
-      3. code_assistant - For coding-related questions.
-      4. default - When other actions are not relevant.
-      
-      Examples:
-      {{next_action_examples}}
-      
-      Question: {question}
-      
-      Given the available actions and question, select next available action to answer the question. Do not provide any comments, just give the next action name.
-      Action:
 
   - task: generate_file_summary
     content: |-

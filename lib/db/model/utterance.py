@@ -13,6 +13,7 @@ class Utterance(Base):
     message = Column(String, nullable=False)
     files = Column(JSON, nullable=True)
     debug = Column(JSON, nullable=True)
+    tool = Column(JSON, nullable=True)
     alternatives = Column(JSON, nullable=True)
     created = Column(DateTime, nullable=False, default=datetime.now)
 

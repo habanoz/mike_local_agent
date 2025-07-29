@@ -6,13 +6,14 @@ from langchain_core.embeddings import Embeddings
 
 
 def ollama_embeddings(config) -> (Embeddings, int):
-    from langchain_community.embeddings import OllamaEmbeddings
+    from langchain_ollama import OllamaEmbeddings
 
     model = config['model']
     dimensions = config['dimensions']
     base_url = config['base_url']
+    num_ctx = config.get('num_ctx', None)
 
-    return NormalizedEmbeddings(OllamaEmbeddings(model=model, base_url=base_url)), dimensions
+    return NormalizedEmbeddings(OllamaEmbeddings(model=model, base_url=base_url, num_ctx=num_ctx)), dimensions
 
 
 def get_file_cached_embeddings(task, provider, model, backing_embeddings) -> Embeddings:

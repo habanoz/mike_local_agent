@@ -4,3 +4,6 @@
 .dev_env
 *.db
 .faiss
+__pycache__
+.env
+*.ipynb
