@@ -1,6 +1,7 @@
 import uuid
 from collections.abc import Callable
 
+import json
 import streamlit as st
 import uuid
 from Home import show_sidebar
@@ -11,7 +12,6 @@ from lib.st.cached import db_manager, config, prompts_registry, user_file_vector
 from lib.utils.chain_output_sink import ChainOutputSink
 from lib.utils.chat_history_utils import get_files_to_keep
 from lib.tool import load_functions
-from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 
 @st.cache_resource
 def chat_history_service():
@@ -67,7 +67,14 @@ def show_debug(debug):
             st.subheader(d['name'])
             st.write(d['content'])
 
-
+@st.experimental_dialog("Tools Info", width="large")
+def show_tools(tools):
+    if not tools:
+        return
+    
+    st.title(f"Tools")
+    st.json(tools)
+            
 def main():
     if "busy" not in st.session_state:
         st.session_state["busy"] = False
@@ -109,20 +116,19 @@ def main():
             chat_history = messages[1:-1]  # first item is introduction, we can skip it.
 
             with st.spinner("Generating response..."):
-                result = get_session_agent()(question, chat_history)
+                result, tools = get_session_agent()(question, chat_history)
 
                 st.write(result)
                 assert isinstance(result, str)
 
                 files = get_chain_sink().get_and_clear_source_files_sink()
                 debug = get_chain_sink().get_and_clear_debug_sink()
-
                 files_to_keep = get_files_to_keep(files, result)
 
             chat_id = st.session_state["chat_id"]
-            chat_history_service().add_utterance(chat_id, "ai", result, files=files_to_keep, debug=debug, tool=tool)
+            chat_history_service().add_utterance(chat_id, "ai", result, files=files_to_keep, debug=debug, tool=json.dumps(tools))
 
-            st.session_state.messages.append({"role": "ai", "content": result, "files": files_to_keep, "debug": debug})
+            st.session_state.messages.append({"role": "ai", "content": result, "files": files_to_keep, "debug": debug, "tool":tools})
 
             st.session_state["busy"] = False
             st.rerun()
@@ -130,7 +136,7 @@ def main():
 
 def show_buttons(message, max_cols, parent_name, parent_index):
     cols = st.columns(max_cols)
-    if "files" in message:
+    if "files" in message and message["files"]:
         files = message["files"]
         for i in range(len(cols) - 1):
             with cols[i]:
@@ -145,7 +151,7 @@ def show_buttons(message, max_cols, parent_name, parent_index):
                 else:
                     st.empty()
 
-    if "debug" in message:
+    if "debug" in message and message["debug"]:
         debug = message["debug"]
         with cols[-1]:
             if st.button("🪲", key=parent_name + str(parent_index) + str("d"),
@@ -154,6 +160,16 @@ def show_buttons(message, max_cols, parent_name, parent_index):
                     wait_failure()
                 else:
                     show_debug(debug)
+    
+    if "tool" in message and message["tool"]:
+        tool = message["tool"]
+        with cols[-1]:
+            if st.button("🪲", key=parent_name + str(parent_index) + str("t"),
+                        disabled=st.session_state["busy"]):
+                if st.session_state["busy"]:
+                    wait_failure()
+                else:
+                    show_tools(json.dumps(tool))
 
 
 if __name__ == '__main__':
@@ -161,7 +177,6 @@ if __name__ == '__main__':
 
     with st.sidebar:
         "Chat with your AI assistant!"
-        "AI assistant makes use of Llama 3 family of models in its pipeline."
 
     show_sidebar()
 

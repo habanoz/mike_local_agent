@@ -2,6 +2,7 @@ from typing import Callable
 from lib.llm.kllm import Kllm
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.prebuilt import create_react_agent
+from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 
 def build_agent(session_id: str, tools: list, config) -> Callable:
     kllm = Kllm(config['llms'])
@@ -19,9 +20,23 @@ def build_agent(session_id: str, tools: list, config) -> Callable:
             
     def add_message(question, chat_history):
         messages = agent.invoke({"messages": [{"role": "user", "content": question}]}, config=invoke_config)['messages']
-        chat_history.clear()
-        chat_history.extend(messages)
-        return messages[-1].content
+        
+        tools = []
+        for message in reversed(messages[:-1]):
+            if isinstance(message, HumanMessage):
+                break
+            elif isinstance(message, ToolMessage):
+                tools.append(message.content)
+            elif isinstance(message, AIMessage):
+                if message.tool_calls:
+                    tools.append(message.tool_calls)
+                else:
+                    break
+            else:
+                raise ValueError(f"Unexpected message type: {type(message)}")
+        
+        tools.reverse()
+        return messages[-1].content, tools
 
     return add_message
 
