@@ -36,7 +36,9 @@ class LLMFactory:
         return ChatGroq(model=config['model'],
                         base_url=config.get('base_url', None),
                         temperature=config['temperature'],
-                        top_p=config.get("top_p", 0.9),
-                        presence_penalty=config.get("presence_penalty", 0.0), #-2,2
+                        model_kwargs={
+                            "top_p":config.get("top_p", 0.9),
+                            "presence_penalty":config.get("presence_penalty", 0.0), #-2,2
+                        },
                         reasoning_effort="default" if config.get("think", False) else "none",
                         )
