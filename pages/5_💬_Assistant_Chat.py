@@ -37,14 +37,14 @@ def get_session_agent() -> Callable:
     return st.session_state["session_agent"]
 
 
-@st.experimental_dialog("File")
+@st.dialog("File")
 def display_file(name, content, file):
     st.title(f"File {name}")
     if file: st.write("**File Name**: " + str(file))
     st.write(content)
 
 
-@st.experimental_dialog("Please wait...")
+@st.dialog("Please wait...")
 def wait_failure():
     st.markdown(
         "Due to limitations of the platform, engaging with UI buttons"
@@ -56,7 +56,7 @@ def wait_failure():
         st.rerun()
 
 
-@st.experimental_dialog("Debug Info", width="large")
+@st.dialog("Debug Info", width="large")
 def show_debug(debug):
     if not debug:
         return
@@ -67,7 +67,7 @@ def show_debug(debug):
             st.subheader(d['name'])
             st.write(d['content'])
 
-@st.experimental_dialog("Tools Info", width="large")
+@st.dialog("Tools Info", width="large")
 def show_tools(tools):
     if not tools:
         return

@@ -15,14 +15,14 @@ def chat_history_service():
     return ChatHistoryService(db_manager())
 
 
-@st.experimental_dialog("File")
+@st.dialog("File")
 def display_file(name, content, file):
     st.title(f"File {name}")
     if file: st.write("**File Name**: " + str(file))
     st.write(content)
 
 
-@st.experimental_dialog("Debug Info", width="large")
+@st.dialog("Debug Info", width="large")
 def show_debug(debug):
     tabs = st.tabs([d['name'].replace("prompt", "prmp")[:11] for d in debug])
     for tab, d in zip(tabs, debug):

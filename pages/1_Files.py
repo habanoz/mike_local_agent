@@ -27,7 +27,7 @@ def remove_file(file):
     st.rerun()
 
 
-@st.experimental_dialog("Edit")
+@st.dialog("Edit")
 def edit_summary(user_file: UserFile):
     edited_summary = st.text_area(label="Summary", value=user_file.summary)
     if st.button("Save"):

@@ -9,7 +9,11 @@ trasactions = {"123": [{"id": "tx1", "amount": 100, "description": "Deposit"}, {
 balances = {"123": 1000, "456": 0, "333": 1000}
 
 def list_bank_accounts() -> str:  
-    """List bank accounts for the user. You can use this function to get the list of account ids. This can be useful to allow user to select an account for further operations."""
+    """List bank accounts for the user. You can use this function to get the list of account ids. This can be useful to allow user to select an account for further operations.
+    
+    Returns:
+        str: A JSON representation of list of accounts. Accounts are represented as a list of dictionaries with keys: id, name, balance.
+    """
     return json.dumps(accounts)
 
 def list_bank_transactions(account_id: str) -> str:  
