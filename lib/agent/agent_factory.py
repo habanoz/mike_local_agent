@@ -3,8 +3,9 @@ from lib.llm.kllm import Kllm
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.prebuilt import create_react_agent
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
+from lib.chain.prompt_registry import PromptRegistry
 
-def build_agent(session_id: str, tools: list, config) -> Callable:
+def build_agent(session_id: str, tools: list, config, prompts_registry: PromptRegistry) -> Callable:
     kllm = Kllm(config['llms'])
     checkpointer = InMemorySaver()
 
@@ -12,9 +13,9 @@ def build_agent(session_id: str, tools: list, config) -> Callable:
     invoke_config = set_trace_config(invoke_config, config, session_id)
     
     agent = create_react_agent(
-        model=kllm.get_deterministic_llm(),  
+        model=kllm.get_agent_llm(),  
         tools=tools if tools else None,  
-        prompt="You are a helpful assistant, answer the user's questions. Use provided tools if necessary.",
+        prompt=prompts_registry.prompts["agent_system"],
         checkpointer=checkpointer
     )
             
@@ -54,6 +55,9 @@ def set_trace_config(invoke_config, config, session_id: str):
         raise ValueError("Trace backend must be specified in the config.")
     
     provider = trace_config["provider"]
+    if provider == "none":
+        return
+    
     if provider == "langfuse":
         from langfuse.langchain import CallbackHandler
         langfuse_handler = CallbackHandler()

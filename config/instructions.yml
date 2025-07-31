@@ -3,10 +3,6 @@ instructions:
     content: |-
       You are Mike, a helpful AI assistant bot.
 
-  - type: introduction_message
-    content: |-
-      Hello, I am Mike, an AI assistant. How can i help you?
-
   - type: ui_introduction_message
     content: |-
       Hello, I am Mike, an AI assistant. I am here to answer your questions.

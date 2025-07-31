@@ -8,7 +8,6 @@ def _load_yaml_file(file):
         except Exception:
             raise
 
-
 class PromptRegistry:
     def __init__(self):
         self.task_map = {}

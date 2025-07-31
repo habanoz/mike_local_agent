@@ -114,45 +114,12 @@ def show_buttons(utterance, max_cols, parent_name, parent_index):
         with cols[-1]:
             if st.button("🪲", key=parent_name + str(parent_index) + str("d")):
                 show_debug(utterance.debug)
-        with cols[-2]:
-            if st.button("♻️", key=parent_name + str(parent_index) + str("r")):
-                re_generate(utterance)
-
-
-@st.experimental_dialog("Re-generate")
-def re_generate(utterance: Utterance):
-    items: list[dict] = utterance.debug
-    answer_prompt = next(filter(lambda item: 'prompt' in item['name'] and 'answer' in item['name'], items), None)
-
-    messages = answer_prompt['content']
-    prompt = ChatPromptTemplate.from_messages([(msg['role'], dequote(msg['content'])) for msg in messages])
-
-    model_name, model = get_re_generate_model()
-    if model:
-        answer_stream = (prompt | model | StrOutputParser()).stream({})
-        result = st.write_stream(answer_stream)
-
-        if utterance.alternatives is None:
-            utterance.alternatives = []
-
-        utterance.alternatives.append({'name': model_name, 'content': dequote(result)})
-        chat_history_service().update_utterance_alternatives(utterance)
-
 
 def dequote(s):
     s = s.replace("\\n", "\n")
     if (len(s) >= 2 and s[0] == s[-1]) and s.startswith(("'", '"')):
         return s[1:-1]
     return s
-
-
-def get_re_generate_model():
-    model_names = "llama3-8b"
-    model_name = st.selectbox("Select a model", [model_names])
-    if st.button("Re-generate"):
-        if model_name == "llama3-8b":
-            return model_name, Kllm(config()['llms']).get_answer_llm()
-    return None, None
 
 
 if __name__ == '__main__':

@@ -32,7 +32,7 @@ def get_session_agent() -> Callable:
         with st.spinner("Building..."):
             print("Building chat session...")
             session_id = st.session_state["chat_id"]
-            st.session_state["session_agent"] = build_agent(session_id=session_id, tools=get_available_tools(), config=config())
+            st.session_state["session_agent"] = build_agent(session_id=session_id, tools=get_available_tools(), config=config(), prompts_registry=prompts_registry())
 
     return st.session_state["session_agent"]
 
