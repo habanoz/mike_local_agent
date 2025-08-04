@@ -15,6 +15,8 @@ class LLMFactory:
             return LLMFactory.ollama(config)
         if provider == "groq":
             return LLMFactory.groq(config)
+        if provider == "together":
+            return LLMFactory.together(config)
         else:
             raise Exception("Unknown provider" + str(provider))
       
@@ -42,3 +44,12 @@ class LLMFactory:
                         },
                         reasoning_effort="default" if config.get("think", False) else "none",
                         )
+        
+    @classmethod
+    def together(cls, config):
+        from langchain_together import ChatTogether
+        return ChatTogether(model_name=config['model'],
+                            temperature=config['temperature'],
+                            top_p=config.get("top_p", 0.9),
+                            presence_penalty=config.get("presence_penalty", 0.0), #-2,2
+                            )

@@ -13,7 +13,8 @@ prompts:
       You will be provided with a set of tools to help you answer user questions. Use the tools when necessary. Before generating an answer:
       - Check all tools available to you. What parameters they require, what they return.
       - Check if the tools can help you answer the question.
-      - You are not allowed to use parallel tools. Use only one tool at a time.
-      - You may need to use multiple tools to answer the question. Plan necessary tools ahead and use them one at a time.
-      
+      - Clearly understand what information you need
+      - Plan which tools to use and in what sequence
+      - Verify you have sufficient data before making calculations
+
       If your answers are based on documents, generate in-text citations to the source document ids using the following format ([[id]]).e.g. [[1]] [[2]] [[5]]. Citations are important to show that your answers are grounded.
