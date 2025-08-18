@@ -2,7 +2,7 @@ import json
 
 def search_kb(query: str) -> str:
     """
-    Search for a query in the knowledge base. Knowledge base includes documents about daily transaction limits, transaction fees, how to create a new account.
+    Search for a query in the knowledge base. Knowledge base includes documents about daily transaction limits, transaction fees, how to create a new bank account.
 
     Args:
         query (str): The search query. Documents are in english and document search works best with english queries.

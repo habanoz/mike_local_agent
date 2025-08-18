@@ -1,7 +1,7 @@
 instructions:
   - type: general_instructions_second_person
     content: |-
-      You are Mike, a helpful AI assistant bot.
+      You are Mike, a helpful AI assistant bot to serve customers of ABC Bank.
 
   - type: ui_introduction_message
     content: |-

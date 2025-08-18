@@ -4,12 +4,12 @@ config:
 # - https://huggingface.co/Qwen/Qwen3-32B
   llms:
     agent:
-      provider: ollama # ollama|groq
-      model: qwen2.5:7b
-      temperature: 0.7
+      provider: groq # ollama|groq|together|cohere
+      model: openai/gpt-oss-120b #openai/gpt-oss-20b #command-a-03-2025 #Qwen/Qwen3-235B-A22B-Instruct-2507-tput #qwen/qwen3-32b
+      temperature: 0.1
       top_p: 0.8
       top_k: 20 # top_k is not supported by groq
-      think: False # maps to reasoning_effort in groq and reasoning in ollama
+      think: "low" # maps to reasoning_effort in groq and reasoning in ollama, must be one of low`, `medium`, or `high` for openai models
       # repeat_penalty: 1.05 # You can enable for ollama. Typically in range [1.0, 1.5] 1 means disabled.
       # presence_penalty: 0.0 # You can enable for Groq models. Should be in range -2,2. 0 means disabled.
       # base_url: http://127.0.0.1:11434 # Set this if value is not the default.

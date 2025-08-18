@@ -17,6 +17,8 @@ class LLMFactory:
             return LLMFactory.groq(config)
         if provider == "together":
             return LLMFactory.together(config)
+        if provider == "cohere":
+            return LLMFactory.cohere(config)
         else:
             raise Exception("Unknown provider" + str(provider))
       
@@ -35,6 +37,11 @@ class LLMFactory:
     @classmethod
     def groq(cls, config):
         from langchain_groq import ChatGroq
+        
+        reasoning = config.get("think", False)
+        if isinstance(reasoning, bool):
+            reasoning = "default" if reasoning else "none"
+            
         return ChatGroq(model=config['model'],
                         base_url=config.get('base_url', None),
                         temperature=config['temperature'],
@@ -42,7 +49,7 @@ class LLMFactory:
                             "top_p":config.get("top_p", 0.9),
                             "presence_penalty":config.get("presence_penalty", 0.0), #-2,2
                         },
-                        reasoning_effort="default" if config.get("think", False) else "none",
+                        reasoning_effort=reasoning,
                         )
         
     @classmethod
@@ -52,4 +59,11 @@ class LLMFactory:
                             temperature=config['temperature'],
                             top_p=config.get("top_p", 0.9),
                             presence_penalty=config.get("presence_penalty", 0.0), #-2,2
+                            )
+
+    @classmethod
+    def cohere(cls, config):
+        from langchain_cohere import ChatCohere
+        return ChatCohere(model=config['model'],
+                            temperature=config['temperature'],
                             )

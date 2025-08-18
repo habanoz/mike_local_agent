@@ -15,3 +15,5 @@ langchain-text-splitters
 python-dotenv
 langgraph
 langfuse
+langchain-together
+langchain-cohere
