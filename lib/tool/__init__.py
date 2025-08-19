@@ -11,6 +11,6 @@ def load_functions():
             module = importlib.import_module(module_name)
             for name, obj in inspect.getmembers(module, inspect.isfunction):
                 # Only include functions defined in this module
-                if obj.__module__ == module.__name__:
+                if obj.__module__ == module.__name__ and not name.startswith('_'):
                     functions[name] = obj
     return functions
